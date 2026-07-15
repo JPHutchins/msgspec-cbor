@@ -61,6 +61,9 @@ def decode(buf, *, type=Any, strict=True, dec_hook=None) -> Any: ...
 
 The signatures mirror `msgspec.toml` / `msgspec.yaml`, so this is a drop-in sibling format.
 
+`order` accepts msgspec's `"deterministic"` / `"sorted"` (lexicographic) plus `"canonical"`, which
+emits CBOR canonical length-first key ordering (cbor2's `canonical=True`) for byte-exact wire formats.
+
 ## Not affiliated
 
 This is an independent bridge and is **not affiliated with or endorsed by the msgspec project**.
