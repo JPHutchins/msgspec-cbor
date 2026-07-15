@@ -121,6 +121,55 @@ def test_order_is_byte_stable() -> None:
 		assert first == second
 
 
+def test_order_canonical_is_length_first() -> None:
+	payload = {
+		"hash": b"\x00",
+		"slot": 0,
+		"image": 0,
+		"active": True,
+		"pending": False,
+		"version": "1.0",
+		"bootable": True,
+		"confirmed": True,
+		"permanent": False,
+	}
+	length_first = [
+		"hash",
+		"slot",
+		"image",
+		"active",
+		"pending",
+		"version",
+		"bootable",
+		"confirmed",
+		"permanent",
+	]
+	buf = msgspec_cbor.encode(payload, order="canonical")
+	assert_type(buf, bytes)
+	assert list(cbor2.loads(buf)) == length_first
+	assert buf != msgspec_cbor.encode(payload, order="sorted")
+
+
+def test_order_canonical_matches_cbor2_canonical() -> None:
+	builtin_types = (
+		datetime.datetime,
+		datetime.date,
+		bytes,
+		bytearray,
+		decimal.Decimal,
+		uuid.UUID,
+	)
+	record = Record(
+		when=datetime.datetime(2024, 1, 1, tzinfo=datetime.timezone.utc),
+		blob=b"\xde\xad",
+		amount=decimal.Decimal("9.99"),
+		ident=uuid.UUID(int=0),
+	)
+	assert msgspec_cbor.encode(record, order="canonical") == cbor2.dumps(
+		msgspec.to_builtins(record, builtin_types=builtin_types), canonical=True
+	)
+
+
 def test_malformed_cbor_wraps_as_decode_error() -> None:
 	with pytest.raises(msgspec.DecodeError) as excinfo:
 		msgspec_cbor.decode(b"\x82\x01")

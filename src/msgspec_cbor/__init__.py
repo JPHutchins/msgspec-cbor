@@ -36,9 +36,13 @@ def encode(
 	obj: Any,
 	*,
 	enc_hook: Callable[[Any], Any] | None = None,
-	order: Literal["deterministic", "sorted"] | None = None,
+	order: Literal["deterministic", "sorted", "canonical"] | None = None,
 ) -> bytes:
 	"""Serialize an object as CBOR.
+
+	``order="canonical"`` sorts map keys length-first (shortest encoding first,
+	then bytewise), matching cbor2's canonical mode; ``"deterministic"`` and
+	``"sorted"`` apply msgspec's lexicographic orderings instead.
 
 	Raises:
 		msgspec.EncodeError: If the object cannot be represented as CBOR (e.g. a
@@ -46,7 +50,13 @@ def encode(
 	"""
 	try:
 		return _cbor2.dumps(
-			_to_builtins(obj, builtin_types=_BUILTIN_TYPES, enc_hook=enc_hook, order=order)
+			_to_builtins(
+				obj,
+				builtin_types=_BUILTIN_TYPES,
+				enc_hook=enc_hook,
+				order=None if order == "canonical" else order,
+			),
+			canonical=order == "canonical",
 		)
 	except _cbor2.CBOREncodeError as exc:
 		raise _EncodeError(str(exc)) from None
