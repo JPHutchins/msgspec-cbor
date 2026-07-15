@@ -31,4 +31,4 @@ matrix = Sequential(
 	},
 )
 
-_ = Config(default_task=check, github_task=matrix, agent=Claude(fix=fix, check=check))
+_ = Config(default_task=check, github_task=check, agent=Claude(fix=fix, check=check))

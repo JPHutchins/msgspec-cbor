@@ -11,8 +11,27 @@ permissions:
   contents: read
 
 jobs:
-  check:
+  discover:
     runs-on: ubuntu-latest
+    outputs:
+      pythons: ${{ steps.set.outputs.pythons }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - id: set
+        shell: bash
+        run: |
+          pythons=$(grep -vE '^[[:space:]]*(#|$)' .python-version | jq -Rsc 'split("\n") | map(select(length > 0))')
+          echo "pythons=$pythons" >> "$GITHUB_OUTPUT"
+
+  check:
+    needs: discover
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest]
+        python: ${{ fromJSON(needs.discover.outputs.pythons) }}
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -21,6 +40,8 @@ jobs:
       - uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
 
       - run: uv run camas
+        env:
+          UV_PYTHON: ${{ matrix.python }}
 
   build:
     needs: check
