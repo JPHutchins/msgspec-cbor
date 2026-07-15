@@ -1,0 +1,141 @@
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "msgspec-cbor"
+dynamic = ["version"]
+description = "CBOR encoding and decoding for msgspec, backed by cbor2."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "JP Hutchins", email = "jp@intercreate.io" }]
+keywords = ["CBOR", "msgspec", "cbor2", "serialization", "validation"]
+classifiers = [
+"Development Status :: 4 - Beta",
+"License :: OSI Approved :: MIT License",
+"Programming Language :: Python :: 3.10",
+"Programming Language :: Python :: 3.11",
+"Programming Language :: Python :: 3.12",
+"Programming Language :: Python :: 3.13",
+"Programming Language :: Python :: 3.14",
+"Typing :: Typed",
+]
+dependencies = ["msgspec>=0.19", "cbor2>=5.6"]
+
+[project.urls]
+Homepage = "https://github.com/JPHutchins/msgspec-cbor"
+Issues = "https://github.com/JPHutchins/msgspec-cbor/issues"
+
+[dependency-groups]
+test = []
+dev = [
+"actionlint-py>=1.7,<2",
+"camas[mcp]==0.1.24",
+"mypy",
+"pyright",
+"ruff",
+"typing-extensions",
+"pytest>=9,<10",
+]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/msgspec_cbor"]
+
+[tool.mypy]
+strict = true
+extra_checks = true
+warn_unreachable = true
+python_version = "3.10"
+files = ["src", "tests"]
+
+[tool.pyright]
+typeCheckingMode = "strict"
+pythonVersion = "3.10"
+include = ["src", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+# preview is on solely to reach the DOC rules; explicit-preview-rules keeps
+# every other preview rule out until selected by exact code.
+preview = true
+explicit-preview-rules = true
+select = [
+"ASYNC",  # flake8-async
+"B",      # flake8-bugbear
+"C4",     # flake8-comprehensions
+"D",      # pydocstyle
+"DOC102", # pydoclint (preview): documented params that don't exist
+"DOC202", # pydoclint (preview): documented returns that don't exist
+"DOC403", # pydoclint (preview): documented yields that don't exist
+"DOC501", # pydoclint (preview): raised exceptions must be documented
+"DOC502", # pydoclint (preview): documented exceptions that aren't raised
+"E",      # pycodestyle errors
+"F",      # pyflakes
+"FA",     # flake8-future-annotations
+"FLY",    # flynt
+"FURB",   # refurb
+"G",      # flake8-logging-format
+"I",      # isort
+"ICN",    # flake8-import-conventions
+"INP",    # flake8-no-pep420
+"ISC",    # flake8-implicit-str-concat
+"LOG",    # flake8-logging
+"N",      # pep8-naming
+"PERF",   # perflint
+"PGH",    # pygrep-hooks
+"PIE",    # flake8-pie
+"PL",     # pylint
+"PT",     # flake8-pytest-style
+"PTH",    # flake8-use-pathlib
+"PYI",    # flake8-pyi
+"RET",    # flake8-return
+"RSE",    # flake8-raise
+"RUF",    # ruff-specific
+"SIM",    # flake8-simplify
+"SLF",    # flake8-self
+"SLOT",   # flake8-slots
+"TC",     # flake8-type-checking
+"TRY",    # tryceratops
+"UP",     # pyupgrade
+"W",      # pycodestyle warnings
+"YTT",    # flake8-2020
+]
+ignore = [
+# tab indentation + formatter conflicts
+# (https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules)
+"W191",
+"E101",
+"E111",
+"E114",
+"E117",
+"D206",
+"D300",
+"ISC001",
+"ISC002",
+"E501",   # the formatter owns line length
+"D105",   # magic method contracts are defined by the data model, not prose
+"D107",   # __init__ is documented by its class
+"D417",   # params belong to the type system, not prose
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D", "PLR2004"] # tests document themselves by name; assert against honest literals
+
+[tool.ruff.format]
+indent-style = "tab"
